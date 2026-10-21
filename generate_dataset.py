@@ -1,0 +1,1256 @@
+"""Generate comprehensive, high-quality demonstration dataset of 104 T20 Cricket World Cup articles.
+
+Covers:
+- Squad Announcements & Selections
+- Match Reports & Results
+- Player Performances & Records
+- Batting & Bowling Analysis
+- Tournament Schedules & Venues
+- Team Updates & Injuries
+- Semifinals & Finals
+- Historical Tournament Milestones
+"""
+
+import csv
+from pathlib import Path
+
+DATA_FILE = Path(__file__).resolve().parent / "data" / "t20_cricket_news.csv"
+
+# 104 realistic articles covering all 8 required topics
+ARTICLES = [
+    # Category 1: Match Reports & Results (15 articles)
+    {
+        "title": "India Edge South Africa in Thrilling Barbados Final to Lift T20 World Cup 2024",
+        "category": "Match Reports & Results",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-29",
+        "text": (
+            "India ended their 11-year global title drought with a breathtaking seven-run victory over "
+            "South Africa in the ICC Men's T20 World Cup 2024 final at Kensington Oval in Bridgetown, Barbados. "
+            "Opting to bat first after winning the toss, India recovered from an early collapse of 34 for 3 "
+            "thanks to Virat Kohli's measured 76 off 59 deliveries and Axar Patel's attacking 47 off 31 balls. "
+            "India posted a competitive total of 176 for 7 in their 20 overs. In reply, South Africa appeared in "
+            "complete control when Heinrich Klaasen launched a ferocious assault, smashing 52 from 27 balls. "
+            "With South Africa needing just 30 runs from 30 balls with six wickets in hand, Jasprit Bumrah and Hardik Pandya "
+            "turned the game on its head. Bumrah bowled a masterly 16th and 18th over, finishing with figures of 2 for 18. "
+            "Hardik Pandya defended 16 runs in the final over, aided by a sensational boundary-line catch by Suryakumar Yadav "
+            "to dismiss David Miller, sealing an emotional triumph for the Rohit Sharma-led Indian side."
+        )
+    },
+    {
+        "title": "USA Stun Pakistan in Historic Super Over Victory at Grand Prairie",
+        "category": "Match Reports & Results",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-06",
+        "text": (
+            "In one of the greatest upsets in cricket history, co-hosts United States defeated former champions Pakistan "
+            "in a dramatic Super Over at the Grand Prairie Stadium in Dallas. Pakistan, batting first, struggled against "
+            "disciplined seam bowling led by Nosthush Kenjige and Saurabh Netravalkar, posting 159 for 7. In reply, USA captain "
+            "Monank Patel anchored the chase with a composed half-century, while Aaron Jones and Nitish Kumar struck crucial boundaries. "
+            "With five needed off the final delivery of regulation overs, Nitish Kumar drove Haris Rauf through the covers for four to tie the match. "
+            "In the Super Over, USA scored 18 runs against Mohammad Amir, who struggled with extras and overthrows. Defending 18, "
+            "software engineer and left-arm seamer Saurabh Netravalkar bowled with immense composure, conceding only 13 runs to spark "
+            "wild celebrations across American cricket communities."
+        )
+    },
+    {
+        "title": "Afghanistan Stun Australia in St Vincent to Keep Semifinal Hopes Alive",
+        "category": "Match Reports & Results",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-23",
+        "text": (
+            "Afghanistan achieved their maiden international victory over Australia in an unforgettable Super Eight clash "
+            "at the Arnos Vale Ground in Kingstown, St Vincent. Opening batters Rahmanullah Gurbaz (60) and Ibrahim Zadran (51) "
+            "laid a magnificent foundation with a 118-run partnership on a sluggish surface, guiding Afghanistan to 148 for 6. "
+            "Australia's reply never gained sustained momentum despite Glenn Maxwell's counter-attacking 59 off 41 balls. "
+            "Seamer Gulbadin Naib produced a career-defining spell, picking up 4 for 20 with clever variations in pace. "
+            "Naveen-ul-Haq struck early to dismiss Travis Head for a duck and later removed Mitchell Marsh. Afghanistan bundled "
+            "out Australia for 127 in 19.2 overs, securing a historic 21-run triumph that reshaped the tournament landscape."
+        )
+    },
+    {
+        "title": "Australia Dismantle England by 36 Runs in High-Octane Barbados Encounter",
+        "category": "Match Reports & Results",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-08",
+        "text": (
+            "Australia asserted their tournament credentials with a dominant 36-run victory over defending champions England "
+            "at Kensington Oval in Barbados. Openers Travis Head (34 off 18) and David Warner (39 off 16) attacked England's new-ball "
+            "bowlers ruthlessly, adding 70 runs within five overs. Glenn Maxwell, Mitchell Marsh, and Marcus Stoinis sustained "
+            "the assault to lift Australia to 201 for 7, the highest total of the tournament at that venue. England's openers Jos Buttler "
+            "and Phil Salt replied briskly with a 73-run stand, but leg-spinner Adam Zampa turned the contest by dismissing both openers. "
+            "Zampa finished with figures of 2 for 28 as England's middle order faltered against disciplined variations, eventually finishing "
+            "on 165 for 6."
+        )
+    },
+    {
+        "title": "South Africa Survive Bangladesh Scare in Low-Scoring New York Thriller",
+        "category": "Match Reports & Results",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-10",
+        "text": (
+            "South Africa defended a modest total of 113 to defeat Bangladesh by four runs in a nerve-shredding Group D encounter "
+            "at Nassau County International Cricket Stadium in New York. Heinrich Klaasen's gritty 46 off 44 balls on a challenging "
+            "pitch had rescued the Proteas from 23 for 4 after Tanzim Hasan Sakib claimed three quick wickets. In response, Bangladesh "
+            "seemed on track when Towhid Hridoy scored 37. However, Kagiso Rabada and Anrich Nortje clamped down on boundaries during "
+            "the closing overs. Bangladesh needed 11 off Keshav Maharaj's final over. Maharaj held his nerve, dismissing Mahmudullah "
+            "caught at long-on to seal a dramatic defense for South Africa."
+        )
+    },
+    {
+        "title": "New Zealand Crushed by West Indies in Trinidad as Group C Tightens",
+        "category": "Match Reports & Results",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-13",
+        "text": (
+            "Two-time champions West Indies secured qualification for the Super Eight stage with a clinical 13-run win over "
+            "New Zealand at the Brian Lara Cricket Academy in Tarouba. Sherfane Rutherford played the innings of his life, smashing "
+            "an unbeaten 68 off 39 balls with six sixes after the hosts were reduced to 76 for 7. Trent Boult took 3 for 16, but New Zealand "
+            "conceded 37 runs in the final two overs. In reply, the Black Caps struggled against the left-arm spin of Gudakesh Motie (3 for 25) "
+            "and the pace of Alzarri Joseph (4 for 19), finishing on 136 for 9 to suffer early elimination from the competition."
+        )
+    },
+    {
+        "title": "India Thrash Pakistan in Low-Scoring Classic at Nassau County Stadium",
+        "category": "Match Reports & Results",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-09",
+        "text": (
+            "India staged an astonishing defense of 119 to defeat arch-rivals Pakistan by six runs before a packed crowd of 34,000 "
+            "at Nassau County International Cricket Stadium in East Meadow, New York. Naseem Shah and Haris Rauf dismantled India's "
+            "batting line-up on an uneven surface, bowling India out for 119 in 19 overs. Rishabh Pant was the sole Indian batter to "
+            "excel with a brave 42. In reply, Pakistan reached 72 for 2 and appeared in command before Jasprit Bumrah delivered a spell "
+            "for the ages. Bumrah bowled Mohammad Rizwan for 31 and finished with figures of 3 for 14 in four overs, while Hardik Pandya "
+            "claimed crucial middle-order scalps to restrict Pakistan to 113 for 7."
+        )
+    },
+    {
+        "title": "England Squeeze Past West Indies in Super Eight Opener with Salt Special",
+        "category": "Match Reports & Results",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-19",
+        "text": (
+            "England opened their Super Eight campaign with an emphatic eight-wicket victory over co-hosts West Indies at the Daren Sammy "
+            "Cricket Ground in Gros Islet, St Lucia. West Indies posted a competitive 180 for 4, spearheaded by Nicholas Pooran's 36 and "
+            "late fireworks from Rovman Powell and Romario Shepherd. However, England chased down the target in just 17.3 overs. Phil Salt "
+            "blasted an unbeaten 87 from 47 deliveries, including five sixes, while Jonny Bairstow provided explosive support with 48 not out "
+            "off 26 balls. Salt took 30 runs off a single Romario Shepherd over to extinguish the home crowd's hopes."
+        )
+    },
+    {
+        "title": "Uganda Record Memorable First-Ever T20 World Cup Win Against Papua New Guinea",
+        "category": "Match Reports & Results",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-05",
+        "text": (
+            "In an emotional milestone for Associate cricket, Uganda claimed their maiden ICC Men's T20 World Cup victory by defeating "
+            "Papua New Guinea by three wickets in Providence, Guyana. Uganda's seam attack, led by 43-year-old Frank Nsubuga and Alpesh Ramjani, "
+            "bowled with remarkable discipline to skittle Papua New Guinea for 77 runs in 19.1 overs. Nsubuga delivered the most economical "
+            "four-over spell in tournament history, conceding only four runs while taking two wickets. Despite losing early wickets in the chase, "
+            "Riazat Ali Shah scored a gritty 33 to carry Uganda across the finish line in the 19th over."
+        )
+    },
+    {
+        "title": "South Africa Edge Nepal by One Run in Kingstown Classic",
+        "category": "Match Reports & Results",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-14",
+        "text": (
+            "South Africa survived an enormous scare from spirited Nepal, escaping with a heart-stopping one-run victory at Arnos Vale "
+            "Ground in Kingstown, St Vincent. Kushal Bhurtel and Dipendra Singh Airee shared seven wickets between them as Nepal restricted "
+            "the Proteas to 115 for 7. Nepal's chase was anchored by Aasif Sheikh's 42, putting them on the verge of the biggest shock in their "
+            "sporting history. Tabraiz Shamsi bowled magnificently to take 4 for 19. With two runs required from the final delivery, Ottneil Baartman "
+            "beat Gulshan Jha's bat and Heinrich Klaasen ran out the non-striker to break Nepalese hearts."
+        )
+    },
+    {
+        "title": "Australia Brush Aside Namibia to Seal Super Eight Qualification",
+        "category": "Match Reports & Results",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-11",
+        "text": (
+            "Australia dismantled Namibia by nine wickets in North Sound, Antigua, bowling out their opponents for 72 before chasing the "
+            "target in just 5.4 overs. Leg-spinner Adam Zampa became the first Australian male cricketer to reach 100 T20 international wickets, "
+            "finishing with figures of 4 for 12. Josh Hazlewood and Marcus Stoinis supported with two wickets each. David Warner and Travis Head "
+            "launched an immediate assault in response, scoring 74 for 1 in 34 deliveries to ensure a dominant net run rate advantage."
+        )
+    },
+    {
+        "title": "India Outclass Australia in Super Eight Behind Rohit Sharma's Blistering 92",
+        "category": "Match Reports & Results",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-24",
+        "text": (
+            "India booked their place in the semifinals with a commanding 24-run win over Australia at the Daren Sammy Cricket Ground in St Lucia. "
+            "Captain Rohit Sharma produced a masterclass of T20 batting, smashing 92 off 41 balls with seven fours and eight sixes. Rohit took 29 runs "
+            "off a single Mitchell Starc over in a ferocious display of power-hitting, guiding India to 205 for 5. Australia mounted a spirited chase "
+            "led by Travis Head's 76 off 43 balls, but Kuldeep Yadav and Jasprit Bumrah struck vital blows. Bumrah dismissed Head with a trademark "
+            "slower ball as Australia were restricted to 181 for 7."
+        )
+    },
+    {
+        "title": "West Indies Rout Afghanistan in Final Group C Match at Daren Sammy Stadium",
+        "category": "Match Reports & Results",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-17",
+        "text": (
+            "Co-hosts West Indies signed off their group campaign with an emphatic 104-run demolition of Afghanistan in Gros Islet, St Lucia. "
+            "Nicholas Pooran delivered an exhibition of clean hitting, bludgeoning 98 off 53 balls with eight sixes as West Indies posted a "
+            "daunting 218 for 5. Afghanistan, who had already qualified for the Super Eight stage, crumbled under scoreboard pressure against the "
+            "spin-pace combination of Akeal Hosein and Obed McCoy, being bowled out for 114 in 16.2 overs."
+        )
+    },
+    {
+        "title": "Scotland Bowled Out by Australia as England Sneak Into Super Eights",
+        "category": "Match Reports & Results",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-15",
+        "text": (
+            "Australia chased down 181 with two balls to spare against Scotland in St Lucia to knock the Scots out of the tournament and hand "
+            "arch-rivals England a lifeline into the Super Eights. Brandon McMullen had played an inspired innings of 60 from 34 balls to push "
+            "Scotland to 180 for 5. However, Travis Head (68) and Marcus Stoinis (59) combined in an explosive partnership to overhaul the target, "
+            "leaving Scotland heartbroken after an otherwise commendable tournament campaign."
+        )
+    },
+    {
+        "title": "Bangladesh Edge Netherlands in Crucial Kingstown Group Encounter",
+        "category": "Match Reports & Results",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-13",
+        "text": (
+            "Bangladesh took a giant step toward Super Eight qualification with a hard-fought 25-run victory over the Netherlands at the Arnos Vale "
+            "Ground in St Vincent. Shakib Al Hasan returned to form with an unbeaten 64 off 46 deliveries, helping Bangladesh post 159 for 5. "
+            "The Dutch chased gamely through Sybrand Engelbrecht's 33, but leg-spinner Rishad Hossain claimed 3 for 33 to halt the European side "
+            "at 134 for 8."
+        )
+    },
+
+    # Category 2: Player Performances & Records (14 articles)
+    {
+        "title": "Jasprit Bumrah Crowned Player of the Tournament for Unmatched Bowling Economy",
+        "category": "Player Performances & Records",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-30",
+        "text": (
+            "Indian fast bowling spearhead Jasprit Bumrah was unanimously named the Player of the Tournament after an extraordinary campaign in the "
+            "ICC Men's T20 World Cup 2024. Bumrah took 15 wickets in eight matches at an astonishing economy rate of 4.17 runs per over and an average "
+            "of 8.26. His spells in clutch encounters against Pakistan (3/14) and South Africa in the final (2/18) cemented his reputation as the world's "
+            "premier all-format bowler. Experts and former captains highlighted his ability to bowl reverse swing, yorkers, and disguise slower deliveries "
+            "under extreme pressure as the defining factor in India's championship run."
+        )
+    },
+    {
+        "title": "Pat Cummins Creates History with Consecutive T20 World Cup Hat-Tricks",
+        "category": "Player Performances & Records",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-22",
+        "text": (
+            "Australia Test captain Pat Cummins entered the record books by becoming the first player in men's cricket history to claim consecutive "
+            "hat-tricks in back-to-back T20 international games. Cummins achieved the feat against Bangladesh in Antigua, dismissing Mahmudullah, "
+            "Mahedi Hasan, and Towhid Hridoy across two overs. Remarkably, less than 48 hours later against Afghanistan in St Vincent, Cummins dismissed "
+            "Rashid Khan, Karim Janat, and Gulbadin Naib to complete his second successive hat-trick, demonstrating unparalleled death-bowling accuracy."
+        )
+    },
+    {
+        "title": "Virat Kohli Signs Off from T20 Internationals with Match-Winning 76 in Barbados",
+        "category": "Player Performances & Records",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-29",
+        "text": (
+            "Virat Kohli announced his retirement from T20 international cricket moments after guiding India to World Cup victory with a player-of-the-match "
+            "innings of 76 against South Africa. Having endured a lean run of scores throughout the tournament while attempting an aggressive opening role, "
+            "Kohli adapted to match context when India slipped to 34 for 3 in the powerplay. He anchored the innings with composure before launching late boundaries, "
+            "finishing with 76 off 59 balls. 'This was my last T20 World Cup, and this is what we wanted to achieve,' Kohli remarked during the post-match ceremony."
+        )
+    },
+    {
+        "title": "Suryakumar Yadav's Acrobatic Boundary Catch immortalized in Cricket Lore",
+        "category": "Player Performances & Records",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-30",
+        "text": (
+            "Suryakumar Yadav produced one of the most athletic and decisive fielding interventions in modern cricket during the final over of the T20 World Cup final. "
+            "With South Africa needing 16 runs to win, David Miller struck a full toss from Hardik Pandya high towards long-off. Suryakumar sprinted along the boundary, "
+            "plucked the ball millimeters inside the rope, flicked it into the air as his momentum carried him across the boundary, and stepped back inbounds to complete "
+            "the catch. The dismissal effectively extinguished South Africa's hopes and will be remembered alongside the greatest catches in World Cup history."
+        )
+    },
+    {
+        "title": "Rahmanullah Gurbaz Finishes as Leading Run-Scorer of T20 World Cup 2024",
+        "category": "Player Performances & Records",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-30",
+        "text": (
+            "Afghanistan wicketkeeper-batter Rahmanullah Gurbaz concluded the 2024 tournament as the leading run-scorer, amassing 281 runs in eight matches at an average "
+            "of 35.12 with three half-centuries. Gurbaz formed a devastating opening alliance with Ibrahim Zadran, setting the tone for Afghanistan's historic surge to the semifinals. "
+            "His match-defining knocks against New Zealand (80) and Australia (60) showcased a mature blend of power-hitting against pace and smart rotation against spin."
+        )
+    },
+    {
+        "title": "Fazalhaq Farooqi and Arshdeep Singh Share Tournament Leading Wicket-Taker Honours",
+        "category": "Player Performances & Records",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-30",
+        "text": (
+            "Left-arm seamers Fazalhaq Farooqi of Afghanistan and Arshdeep Singh of India finished as joint-highest wicket-takers of the 2024 T20 World Cup, capturing "
+            "17 wickets apiece. Farooqi dominated the group stages with sensational new-ball swing in Guyana and Trinidad, recording tournament-best figures of 5 for 9 against Uganda. "
+            "Arshdeep Singh played an indispensable role for champions India, delivering breakthroughs with the new ball and executing pin-point yorkers at the death."
+        )
+    },
+    {
+        "title": "Nicholas Pooran Breaks Chris Gayle's Record for Most Sixes in a Single T20 World Cup",
+        "category": "Player Performances & Records",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-25",
+        "text": (
+            "West Indies left-hander Nicholas Pooran broke Chris Gayle's long-standing tournament record by hitting 17 sixes in the 2024 Men's T20 World Cup. "
+            "Pooran scored 228 runs at a blistering strike rate of 146.15 across seven games. His 98 off 53 balls against Afghanistan in St Lucia featured eight maximums, "
+            "surpassing the previous record of 16 sixes set by Gayle during the 2012 tournament in Sri Lanka."
+        )
+    },
+    {
+        "title": "Rohit Sharma Surpasses Babar Azam to Become Highest Run-Scorer in T20I History",
+        "category": "Player Performances & Records",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-25",
+        "text": (
+            "India captain Rohit Sharma surpassed Pakistan's Babar Azam to become the all-time leading run-scorer in men's T20 international cricket during his match-winning "
+            "innings of 92 against Australia in St Lucia. Rohit finished the tournament with 4,231 career T20I runs from 159 matches. Following the final in Barbados, "
+            "Rohit joined Virat Kohli in announcing his retirement from the shortest international format after securing India's second T20 World Cup crown."
+        )
+    },
+    {
+        "title": "Lockie Ferguson Delivers Four Maiden Overs in Remarkable Spell Against PNG",
+        "category": "Player Performances & Records",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-17",
+        "text": (
+            "New Zealand express fast bowler Lockie Ferguson created a unique world record by bowling four consecutive maiden overs in a T20 World Cup match against "
+            "Papua New Guinea in Tarouba, Trinidad. Ferguson finished with figures of 4-4-0-3, becoming the first bowler in men's T20 international cricket to bowl four maidens "
+            "in a full spell. His searing pace and steep bounce overwhelmed PNG batters, providing a historic highlight in New Zealand's final group fixture."
+        )
+    },
+    {
+        "title": "Heinrich Klaasen's Counter-Attacking 52 Nearly Pulls Off Miracle for Proteas",
+        "category": "Player Performances & Records",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-30",
+        "text": (
+            "Heinrich Klaasen came within inches of scripting South Africa's finest cricketing hour in the 2024 final. Walking in with South Africa precariously placed at 106 for 4, "
+            "Klaasen dismantled India's spinners, taking 24 runs off an Axar Patel over. His 52 off 27 deliveries brought the equation down to a run-a-ball, but an outside edge off "
+            "Hardik Pandya in the 17th over ended his heroic blitz and turned the final back towards India."
+        )
+    },
+    {
+        "title": "Saurabh Netravalkar: The Oracle Engineer Who Captured the Cricket World's Imagination",
+        "category": "Player Performances & Records",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-12",
+        "text": (
+            "United States seamer Saurabh Netravalkar became a global sensation following his heroics against Pakistan and India. Balancing a career as a principal software engineer "
+            "at Oracle with international cricket, the Mumbai-born left-armer dismissed Mohammad Rizwan, Babar Azam, Rohit Sharma, and Virat Kohli during a dream tournament fortnight, "
+            "proving the immense talent pool present across Associate cricket ecosystems."
+        )
+    },
+    {
+        "title": "Rishad Hossain Shines as Emerging Spin Sensation for Bangladesh",
+        "category": "Player Performances & Records",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-20",
+        "text": (
+            "Twenty-one-year-old leg-spinner Rishad Hossain emerged as Bangladesh's biggest positive from the T20 World Cup, picking up 14 wickets in seven matches. "
+            "His tall frame and sharp overspin extracted bounce and turn on Caribbean pitches. His performances against Sri Lanka and the Netherlands demonstrated "
+            "that Bangladesh have discovered a rare and genuine attacking leg-spin asset."
+        )
+    },
+    {
+        "title": "Anrich Nortje Reclaims Best Form with Devastating Pace Spells in New York",
+        "category": "Player Performances & Records",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-11",
+        "text": (
+            "South African fast bowler Anrich Nortje overcame recent injury setbacks to deliver sensational performances in the United States leg of the tournament. "
+            "Nortje claimed 4 for 7 against Sri Lanka and 2 for 17 against Bangladesh at Nassau County Stadium. Utilizing the drop-in surface's uneven bounce, Nortje regularly "
+            "clocked speeds above 145 kph to finish as South Africa's most potent pace weapon."
+        )
+    },
+    {
+        "title": "Aaron Jones Smashes 10 Sixes in USA's Opening Tournament Night Victory",
+        "category": "Player Performances & Records",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-02",
+        "text": (
+            "USA vice-captain Aaron Jones launched the tournament in spectacular fashion with an unbeaten 94 off 40 balls against Canada in Dallas. Chasing 195, "
+            "Jones struck 10 towering sixes to power the co-hosts to victory with 14 balls remaining. His audacious strokeplay set the tone for the United States' historic "
+            "qualification for the Super Eight stage."
+        )
+    },
+
+    # Category 3: Squad Announcements & Selections (13 articles)
+    {
+        "title": "BCCI Announce 15-Member India Squad for T20 World Cup with Pant and Samson Included",
+        "category": "Squad Announcements & Selections",
+        "source": "ICC Media Release",
+        "published_date": "2024-04-30",
+        "text": (
+            "The Board of Control for Cricket in India (BCCI) confirmed their 15-member squad for the ICC Men's T20 World Cup 2024, naming Rohit Sharma as captain "
+            "and Hardik Pandya as vice-captain. Rishabh Pant returned to international cricket following his recovery from a serious car accident, joining Sanju Samson "
+            "as the designated wicketkeepers. The selectors picked four specialist spinners—Kuldeep Yadav, Yuzvendra Chahal, Ravindra Jadeja, and Axar Patel—anticipating "
+            "turning tracks in the West Indies, while Jasprit Bumrah leads a three-man pace unit alongside Arshdeep Singh and Mohammed Siraj."
+        )
+    },
+    {
+        "title": "Mitchell Marsh Named Australia Captain as Selectors Omit Steve Smith",
+        "category": "Squad Announcements & Selections",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-01",
+        "text": (
+            "Cricket Australia confirmed all-rounder Mitchell Marsh as full-time T20 international captain for the upcoming World Cup campaign in the Caribbean and USA. "
+            "The 15-man squad featured the omission of former skipper Steve Smith and young batting sensation Jake Fraser-McGurk. Selection chair George Bailey explained "
+            "that the squad prioritized versatility and multi-dimensional players, with Travis Head, David Warner, Glenn Maxwell, and Marcus Stoinis providing explosive power."
+        )
+    },
+    {
+        "title": "England Recall Jofra Archer as Defending Champions Name Power-Packed 15",
+        "category": "Squad Announcements & Selections",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-04-30",
+        "text": (
+            "Fast bowler Jofra Archer was included in England's 15-member squad for their T20 World Cup title defense, marking his long-awaited return from persistent "
+            "elbow stress fractures. Led by Jos Buttler, England retained the core of their 2022 championship team, including Phil Salt, Harry Brook, Liam Livingstone, "
+            "and Sam Curran. Managing director Rob Key expressed optimism about Archer's match fitness following rigorous rehabilitation programs."
+        )
+    },
+    {
+        "title": "South Africa Opt for Ryan Rickelton and Ottneil Baartman in Reimagined Squad",
+        "category": "Squad Announcements & Selections",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-04-30",
+        "text": (
+            "Cricket South Africa unveiled an aggressive 15-man squad captained by Aiden Markram, awarding maiden World Cup call-ups to domestic standouts Ryan Rickelton "
+            "and seamer Ottneil Baartman following prolific SA20 seasons. Experienced batter Faf du Plessis was not included, while Quinton de Kock, Heinrich Klaasen, "
+            "and David Miller form a destructive middle order. Keshav Maharaj and Tabraiz Shamsi provide frontline spin options."
+        )
+    },
+    {
+        "title": "Pakistan Confirm Babar Azam as Captain for 2024 T20 World Cup Campaign",
+        "category": "Squad Announcements & Selections",
+        "source": "Reuters Cricket",
+        "published_date": "2024-05-24",
+        "text": (
+            "The Pakistan Cricket Board announced Babar Azam as captain for the T20 World Cup following leadership reshuffles earlier in the year. The squad welcomed back "
+            "left-arm fast bowler Mohammad Amir and all-rounder Imad Wasim, both of whom reversed their international retirements to bolster Pakistan's campaign. "
+            "The pace bowling group includes Shaheen Shah Afridi, Naseem Shah, Haris Rauf, and Abbas Afridi."
+        )
+    },
+    {
+        "title": "West Indies Select Shimron Hetmyer and Shamar Joseph for Home World Cup",
+        "category": "Squad Announcements & Selections",
+        "source": "The Guardian Sport",
+        "published_date": "2024-05-03",
+        "text": (
+            "Cricket West Indies named Rovman Powell captain of their 15-member squad for the home tournament. Middle-order batter Shimron Hetmyer earned a recall, "
+            "while test bowling sensation Shamar Joseph received a maiden T20 World Cup berth following his heroic performances in Australia. Co-hosts West Indies "
+            "boast immense depth with Nicholas Pooran, Andre Russell, and Sherfane Rutherford."
+        )
+    },
+    {
+        "title": "New Zealand Name Kane Williamson Captain for Sixth Consecutive T20 World Cup",
+        "category": "Squad Announcements & Selections",
+        "source": "ICC Media Release",
+        "published_date": "2024-04-29",
+        "text": (
+            "New Zealand announced a seasoned 15-man group led by Kane Williamson for the tournament. Veterans Trent Boult and Tim Southee were selected for their fourth "
+            "consecutive T20 World Cup together, supported by Matt Henry and Lockie Ferguson. All-rounders Rachin Ravindra, Daryl Mitchell, and Glenn Phillips provide balance, "
+            "while Finn Allen and Devon Conway spearhead the batting."
+        )
+    },
+    {
+        "title": "Rashid Khan to Lead Afghanistan with Balanced Spin-Heavy Lineup",
+        "category": "Squad Announcements & Selections",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-05-01",
+        "text": (
+            "Afghanistan named star leg-spinner Rashid Khan as captain for their Caribbean campaign. The 15-man squad features a formidable spin contingent including "
+            "Mujeeb Ur Rahman, Noor Ahmad, and Nangeyalia Kharote. The batting lineup is anchored by Rahmanullah Gurbaz, Ibrahim Zadran, and Azmatullah Omarzai, "
+            "with Fazalhaq Farooqi leading the seam attack."
+        )
+    },
+    {
+        "title": "USA Announce Diverse Squad with Corey Anderson and Monank Patel",
+        "category": "Squad Announcements & Selections",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-03",
+        "text": (
+            "USA Cricket confirmed their historic 15-man squad for their maiden Men's T20 World Cup appearance, led by Monank Patel. Former New Zealand international "
+            "Corey Anderson brought valuable World Cup experience to the middle order, while former India Under-19 left-arm seamer Saurabh Netravalkar and dynamic batter "
+            "Aaron Jones provided tournament-defining contributions."
+        )
+    },
+    {
+        "title": "Sri Lanka Back Wanindu Hasaranga to Lead Revamped Squad in USA and Caribbean",
+        "category": "Squad Announcements & Selections",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-09",
+        "text": (
+            "Sri Lanka Cricket confirmed all-rounder Wanindu Hasaranga as captain with Charith Asalanka named vice-captain. Veteran former skipper Angelo Mathews was selected "
+            "to provide middle-order composure. The bowling department features slingers Matheesha Pathirana and Nuwan Thushara alongside mystery spinner Maheesh Theekshana."
+        )
+    },
+    {
+        "title": "Ireland Select Proven Core Led by Paul Stirling for T20 World Cup",
+        "category": "Squad Announcements & Selections",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-05-07",
+        "text": (
+            "Cricket Ireland named an experienced 15-man squad captained by Paul Stirling for fixtures in New York and Florida. Key players include wicketkeeper-batter "
+            "Lorcan Tucker, power-hitter Harry Tector, and left-arm fast bowler Josh Little, who brought Indian Premier League experience to the bowling attack."
+        )
+    },
+    {
+        "title": "Namibia Rely on Gerhard Erasmus and David Wiese for Caribbean Challenge",
+        "category": "Squad Announcements & Selections",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-10",
+        "text": (
+            "Namibia confirmed Gerhard Erasmus as captain for their third consecutive T20 World Cup appearance. Veteran all-rounder David Wiese announced this would be his "
+            "farewell international tournament, providing mentorship to young seamers Ruben Trumpelmann and Bernard Scholtz."
+        )
+    },
+    {
+        "title": "Uganda Cricket Association Announce Historic Squad for Maiden World Cup",
+        "category": "Squad Announcements & Selections",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-06",
+        "text": (
+            "Uganda celebrated their first qualification for any senior cricket World Cup by naming Brian Masaba as captain of their 15-member traveling party. "
+            "The squad includes veteran off-spinner Frank Nsubuga, whose international career spans nearly three decades, alongside all-rounder Alpesh Ramjani and Dinesh Nakrani."
+        )
+    },
+
+    # Category 4: Batting & Bowling Analysis (13 articles)
+    {
+        "title": "Death-Over Bowling Masterclass: How Bumrah and Arshdeep Stifled Opponents",
+        "category": "Batting & Bowling Analysis",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-07-02",
+        "text": (
+            "Tactical analysis of India's victorious T20 World Cup campaign reveals that death-over bowling execution was the decisive tactical differentiator. "
+            "Between overs 16 and 20, India conceded just 6.42 runs per over across the tournament, compared to the global tournament average of 9.85. "
+            "Jasprit Bumrah's mastery of the dipping yorker, hard length deliveries, and deceptive off-cutters forced batters into low-percentage shots. "
+            "Arshdeep Singh complemented Bumrah by targeting wide yorkers outside off stump, effectively eliminating boundary zones for right-handed batters."
+        )
+    },
+    {
+        "title": "The Evolution of the Powerplay: Aggressive Starts vs Wicket Preservation",
+        "category": "Batting & Bowling Analysis",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-27",
+        "text": (
+            "Modern T20 analytics have reshaped powerplay batting strategy, with teams increasingly adopting an ultra-aggressive posture in the first six overs. "
+            "Australia with Travis Head and David Warner, as well as India with Rohit Sharma, prioritized boundary percentages over dot-ball mitigation. "
+            "Data indicated that teams scoring over 50 runs in the powerplay won 74% of matches during the 2024 World Cup, even if they lost one or two wickets, "
+            "proving that early run-rate velocity sets insurmountable targets on challenging pitches."
+        )
+    },
+    {
+        "title": "Why Nassau County's Drop-In Pitches Confounded World's Best Batters",
+        "category": "Batting & Bowling Analysis",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-12",
+        "text": (
+            "The temporary drop-in pitches installed at Nassau County International Cricket Stadium in New York produced intense debate due to variable bounce and seam movement. "
+            "Prepared in Florida and transported to Long Island, the root systems had limited time to bind with local clay. This resulted in spongy bounce and steep deviation "
+            "for tall pacers like Jasprit Bumrah, Anrich Nortje, and Naseem Shah, holding average first-innings scores in New York to just 108 runs."
+        )
+    },
+    {
+        "title": "The Resurrection of Finger Spin: Axar Patel and Akeal Hosein's Tactical Mastery",
+        "category": "Batting & Bowling Analysis",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-28",
+        "text": (
+            "While wrist spinners often dominate T20 headlines, the 2024 World Cup highlighted a tactical renaissance for disciplined left-arm finger spinners. "
+            "Axar Patel of India and Akeal Hosein of West Indies bowled crucial overs inside the powerplay. By varying seam angles, firing deliveries into the stumps "
+            "at speeds between 88 and 96 kph, and utilizing natural drift, they restricted power hitters from swinging freely through the line."
+        )
+    },
+    {
+        "title": "Deciphering Heinrich Klaasen: How Spin Hitting Reached Unprecedented Heights",
+        "category": "Batting & Bowling Analysis",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-07-01",
+        "text": (
+            "Heinrich Klaasen solidified his status as the most destructive batter against spin in contemporary cricket. Biomechanical analysis shows Klaasen generates "
+            "extreme bat speed through a stable base and late hip rotation, allowing him to hit length balls over extra cover and midwicket with equal authority. "
+            "During the World Cup, Klaasen struck at an extraordinary 182.4 against spin bowlers, forcing opposing captains to drastically adjust their bowling rotations."
+        )
+    },
+    {
+        "title": "The Impact of Wind Vectors on Six-Hitting at Caribbean Grounds",
+        "category": "Batting & Bowling Analysis",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-24",
+        "text": (
+            "Ground dimensions and prevailing trade winds played a prominent tactical role across venues in Barbados, St Lucia, and Antigua. "
+            "Captains frequently manipulated bowling matchups to force batters into hitting against 25-knot crosswinds towards longer boundaries measuring over 80 meters. "
+            "Conversely, batters who targeted the shorter downwind boundaries scored over 65% of the tournament's sixes, making wind direction analysis integral to match planning."
+        )
+    },
+    {
+        "title": "Reverse Swing Returns: How Fast Bowlers Found Lateral Movement in Dry Conditions",
+        "category": "Batting & Bowling Analysis",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-26",
+        "text": (
+            "Abrasive Caribbean outfields and scorching daytime conditions facilitated reverse swing during the middle and death overs of the 2024 World Cup. "
+            "Bowlers such as Pat Cummins, Jasprit Bumrah, and Kagiso Rabada scuffed one side of the ball naturally, extracting late tailing movement into the pads of batters. "
+            "This old-ball lateral movement added a challenging dimension that curtailed late-innings boundary sprees."
+        )
+    },
+    {
+        "title": "Middle-Over Squeeze: Why Teams Winning Overs 7 to 15 Dominated Tournament",
+        "category": "Batting & Bowling Analysis",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-27",
+        "text": (
+            "Statistical evaluation demonstrates that matches were largely decided during the middle phase from overs 7 to 15. Teams that lost two or fewer wickets while "
+            "maintaining a run rate above 7.5 in this period won 82% of matches. India's pairing of Kuldeep Yadav and Axar Patel conceded just 6.18 runs per over in the middle overs, "
+            "suffocating opposition scoring opportunities."
+        )
+    },
+    {
+        "title": "Matchup Analytics: The Rise of Left-Arm Seam Against Right-Hand Openers",
+        "category": "Batting & Bowling Analysis",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-18",
+        "text": (
+            "Data analysts heavily emphasized the deployment of left-arm seamers against right-handed opening batters with the new ball. "
+            "Bowlers like Arshdeep Singh, Fazalhaq Farooqi, Shaheen Shah Afridi, and Saurabh Netravalkar created an acute incoming angle that frequently breached front-pad defenses. "
+            "In the first two overs of innings, left-arm pacers accounted for 31 dismissals across the group and Super Eight stages."
+        )
+    },
+    {
+        "title": "The Wicketkeeper Captain: Tactical Advantages in Field Setting and DRS Calls",
+        "category": "Batting & Bowling Analysis",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-16",
+        "text": (
+            "Wicketkeepers captaining international sides enjoyed distinct tactical advantages during the tournament. Positioned behind the stumps, captains like Jos Buttler "
+            "and Monank Patel had optimal sightlines to assess pitch behavior, bowler trajectories, and batter stances. Furthermore, their Decision Review System (DRS) accuracy "
+            "exceeded 68%, far outperforming captains situated in outfield catching positions."
+        )
+    },
+    {
+        "title": "Evaluating Batting Strike Rates on Sub-140 Par Score Caribbean Surfaces",
+        "category": "Batting & Bowling Analysis",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-21",
+        "text": (
+            "While franchise leagues feature totals exceeding 220, the 2024 T20 World Cup reminded audiences of the art of crafting innings on 130-150 par pitches. "
+            "Batters like Kane Williamson, Shakib Al Hasan, and Virat Kohli demonstrated that strike rotation, running between wickets, and reducing dot-ball percentages "
+            "outweighed reckless boundary hunting on gripping, turning surfaces."
+        )
+    },
+    {
+        "title": "The Cross-Batted Short-Ball Trap in Modern T20 Bowling Strategies",
+        "category": "Batting & Bowling Analysis",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-22",
+        "text": (
+            "Fast bowlers increasingly utilized steep, throat-high short deliveries aimed at the batter's chest rather than traditional bouncers over the shoulder. "
+            "With deep backward square leg and deep midwicket positioned on boundary ropes, pacers like Alzarri Joseph and Kagiso Rabada restricted batters from pulling cleanly, "
+            "generating numerous top-edged catches."
+        )
+    },
+    {
+        "title": "Death-Over Batting Metrics: The Impact of Ramped and Scooped Shots",
+        "category": "Batting & Bowling Analysis",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-25",
+        "text": (
+            "As bowlers refined yorker execution, batters countered with innovative 360-degree ramp and scoop shots over fine leg and third man. "
+            "Batters utilizing the scoop against full deliveries scored boundaries at a 44% clip, forcing fielding captains to sacrifice protection at long-on and deep midwicket."
+        )
+    },
+
+    # Category 5: Tournament Schedules & Venues (13 articles)
+    {
+        "title": "ICC Unveils Record 20-Team Tournament Format Across USA and Caribbean",
+        "category": "Tournament Schedules & Venues",
+        "source": "ICC Media Release",
+        "published_date": "2024-01-05",
+        "text": (
+            "The International Cricket Council released the full schedule for the expanded 20-team Men's T20 World Cup 2024, co-hosted by the West Indies and the United States. "
+            "Divided into four groups of five teams, the top two from each pool advanced to a Super Eight stage, followed by semifinals in Trinidad and Guyana and the final in Barbados. "
+            "The tournament featured 55 matches across nine venues, marking cricket's official expansion into North American sports infrastructure."
+        )
+    },
+    {
+        "title": "Kensington Oval Ready to Host Men's T20 World Cup Final After Multimillion Upgrade",
+        "category": "Tournament Schedules & Venues",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-20",
+        "text": (
+            "Barbados' legendary Kensington Oval completed extensive multi-million dollar refurbishments ahead of hosting nine tournament fixtures, including the final. "
+            "Upgrades included enhanced player facilities, energy-efficient LED floodlights, expanded media centers, and improved drainage systems. "
+            "Prime Minister Mia Mottley welcomed fans from around the world to experience the Caribbean's rich cricketing heritage."
+        )
+    },
+    {
+        "title": "Nassau County Stadium: Engineering Feat Brings 34,000-Seat Arena to Long Island",
+        "category": "Tournament Schedules & Venues",
+        "source": "The Guardian Sport",
+        "published_date": "2024-05-15",
+        "text": (
+            "A temporary 34,000-seat modular stadium at Eisenhower Park in East Meadow, New York, was constructed in under four months to host eight tournament matches, "
+            "headlined by the marquee clash between India and Pakistan. The state-of-the-art modular structure utilized grandstands previously used at Formula 1 events, "
+            "creating a historic venue for international cricket on American soil."
+        )
+    },
+    {
+        "title": "Grand Prairie Stadium in Texas Sets the Stage for USA Cricket's Breakthrough",
+        "category": "Tournament Schedules & Venues",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-05-25",
+        "text": (
+            "The former minor-league baseball stadium in Grand Prairie, Texas, was converted into a world-class dedicated cricket arena ahead of hosting the tournament opener. "
+            "Featuring permanent turf wickets and floodlights, Grand Prairie hosted historic victories for the host nation, solidifying the Dallas-Fort Worth metroplex "
+            "as a vibrant cricket destination."
+        )
+    },
+    {
+        "title": "Central Broward Park in Lauderhill Prepares for Florida Fixtures Amid Weather Watch",
+        "category": "Tournament Schedules & Venues",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-08",
+        "text": (
+            "Central Broward Regional Park in Lauderhill, Florida, the United States' first ICC-certified international cricket venue, prepared to host key Group A encounters. "
+            "With South Florida experiencing unseasonal torrential rainfall and flash floods, ground staff and local authorities implemented around-the-clock drainage operations "
+            "to protect the turf wickets."
+        )
+    },
+    {
+        "title": "Daren Sammy Cricket Ground in St Lucia Celebrates High-Scoring Super Eight Festival",
+        "category": "Tournament Schedules & Venues",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-20",
+        "text": (
+            "Gros Islet's Daren Sammy Cricket Ground emerged as the premier batting paradise of the 2024 T20 World Cup. Boasting a true-bouncing pitch and rapid outfields, "
+            "the venue hosted six Super Eight fixtures characterized by high scores, featuring Rohit Sharma's 92 against Australia and Nicholas Pooran's 98 against Afghanistan."
+        )
+    },
+    {
+        "title": "Providence Stadium in Guyana Plays Host to Intense Semifinal Clash",
+        "category": "Tournament Schedules & Venues",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-25",
+        "text": (
+            "Guyana's Providence Stadium hosted the second semifinal between India and England. Known for its clay-based pitch that assists spinners and low-skidding seamers, "
+            "the venue tested batters' patience and footwork under humid equatorial Caribbean conditions."
+        )
+    },
+    {
+        "title": "Arnos Vale Ground in St Vincent Re-Establishes Itself on World Cricket Map",
+        "category": "Tournament Schedules & Venues",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-23",
+        "text": (
+            "After a decade-long absence from senior international men's fixtures, Arnos Vale Ground in Kingstown, St Vincent, provided the stage for two of the tournament's "
+            "most memorable upsets: Afghanistan defeating Australia and Bangladesh edging the Netherlands. The seaside venue's spinning pitch proved a treat for traditionalists."
+        )
+    },
+    {
+        "title": "Brian Lara Cricket Academy in Trinidad Showcases High Drama in Night Games",
+        "category": "Tournament Schedules & Venues",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-15",
+        "text": (
+            "The picturesque Brian Lara Cricket Academy in Tarouba hosted crucial evening fixtures, including West Indies' group decider against New Zealand and the first semifinal. "
+            "The venue's challenging batting conditions and fierce seam movement rewarded bowlers who maintained relentless discipline."
+        )
+    },
+    {
+        "title": "Sir Vivian Richards Stadium in Antigua Celebrates 50th Anniversary of Island Independence",
+        "category": "Tournament Schedules & Venues",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-18",
+        "text": (
+            "Antigua's Sir Vivian Richards Stadium hosted eight World Cup fixtures, welcoming cricket royalty including Viv Richards and Curtly Ambrose. "
+            "The stadium featured prominent performances, including Pat Cummins' historic hat-trick against Bangladesh."
+        )
+    },
+    {
+        "title": "ICC Clarifies Semifinal Rain Rules and Reserve Day Provisions",
+        "category": "Tournament Schedules & Venues",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-24",
+        "text": (
+            "Tournament organizers confirmed the playing conditions for the knockout stages. Semifinal 1 in Trinidad and the final in Barbados included designated reserve days, "
+            "while Semifinal 2 in Guyana had 250 minutes of additional time allocated on match day due to logistical travel constraints between venues."
+        )
+    },
+    {
+        "title": "Logistical Triumph: How ICC Coordinated 20 Teams Across Six Islands and Two Countries",
+        "category": "Tournament Schedules & Venues",
+        "source": "Reuters Cricket",
+        "published_date": "2024-07-03",
+        "text": (
+            "Organizing a multinational sports event across the United States and the Caribbean demanded unprecedented aviation logistics. "
+            "Over 40 chartered regional flights transported squads, broadcast crews, and equipment across thousands of nautical miles, completing 55 fixtures on schedule."
+        )
+    },
+    {
+        "title": "Fans Flock from Across the Globe for Historic USA Leg of Cricket World Cup",
+        "category": "Tournament Schedules & Venues",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-11",
+        "text": (
+            "Over 160,000 spectators attended the 16 tournament matches hosted in New York, Texas, and Florida, highlighting cricket's massive diaspora fan base in North America. "
+            "The international exposure provided a powerful foundation for cricket's inclusion at the Los Angeles 2028 Olympic Games."
+        )
+    },
+
+    # Category 6: Team Updates & Injuries (13 articles)
+    {
+        "title": "Haris Rauf Cleared of Side Strain Ahead of Crucial Super Over Encounter",
+        "category": "Team Updates & Injuries",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-04",
+        "text": (
+            "Pakistan received a major fitness boost when fast bowler Haris Rauf passed medical evaluations following concerns over a recurring pectoral side strain. "
+            "The team doctor confirmed Rauf was bowling at maximum speed during nets in Dallas, allowing Pakistan to field their four-pronged pace attack."
+        )
+    },
+    {
+        "title": "Mitchell Marsh Overcomes Hamstring Concern to Lead Australia",
+        "category": "Team Updates & Injuries",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-03",
+        "text": (
+            "Australian captain Mitchell Marsh was cleared to participate as a specialist batter during the opening group fixtures while managing a minor hamstring niggle "
+            "sustained during the Indian Premier League. Marsh refrained from bowling during early rounds before resuming all-round duties in the Super Eights."
+        )
+    },
+    {
+        "title": "Mujeeb Ur Rahman Ruled Out of T20 World Cup with Hand Injury",
+        "category": "Team Updates & Injuries",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-14",
+        "text": (
+            "Afghanistan suffered a blow when frontline mystery spinner Mujeeb Ur Rahman was ruled out for the remainder of the tournament due to a sprained right index finger. "
+            "The ICC event technical committee approved 22-year-old left-arm spinner Hazratullah Zazai as his squad replacement."
+        )
+    },
+    {
+        "title": "Liam Livingstone Passed Fit Following Knee Jar Against Namibia",
+        "category": "Team Updates & Injuries",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-16",
+        "text": (
+            "England all-rounder Liam Livingstone was declared fit for Super Eight action after scans revealed no structural ligament damage to his left knee. "
+            "Livingstone had jarred his knee while fielding near the boundary against Namibia in Antigua but resumed full training in Gros Islet."
+        )
+    },
+    {
+        "title": "Rohit Sharma Brushes Aside Forearm Contusion Suffered Against Ireland",
+        "category": "Team Updates & Injuries",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-05",
+        "text": (
+            "Indian skipper Rohit Sharma retired hurt on 52 after a rising delivery from Ireland pacer Josh Little struck his right bicep and forearm at Nassau County Stadium. "
+            "Post-match assessments confirmed only mild bruising with no fracture, allowing Sharma to lead India against Pakistan four days later."
+        )
+    },
+    {
+        "title": "Shadab Khan Struggles with Shoulder Impingement as Pakistan Bowlers Feel Strain",
+        "category": "Team Updates & Injuries",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-08",
+        "text": (
+            "Pakistan vice-captain Shadab Khan underwent intensive physiotherapy for shoulder impingement that restricted his bowling workload during early games. "
+            "Pakistan's medical staff monitored his progress as team management debated playing an extra seam bowler."
+        )
+    },
+    {
+        "title": "Brandon Starc Replaces Injured Ashton Agar in Australia Travelling Reserves",
+        "category": "Team Updates & Injuries",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-09",
+        "text": (
+            "Australia adjusted their travelling reserves after left-arm spinner Ashton Agar suffered a calf strain during warm-up sessions in Barbados. "
+            "The team management retained confidence in Adam Zampa as their frontline spinner throughout the campaign."
+        )
+    },
+    {
+        "title": "Brandon McMullen Battles Cramp in Heroic Effort for Scotland",
+        "category": "Team Updates & Injuries",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-16",
+        "text": (
+            "Scotland top-order batter Brandon McMullen showed immense courage while battling severe hamstring cramping during his sensational 60 against Australia. "
+            "Medical staff attended to him repeatedly between overs as temperatures reached 32 degrees Celsius in St Lucia."
+        )
+    },
+    {
+        "title": "Tabraiz Shamsi Returns to South Africa Starting XI After Rib Bruising",
+        "category": "Team Updates & Injuries",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-15",
+        "text": (
+            "Wrist-spinner Tabraiz Shamsi returned to South Africa's playing XI against Nepal after missing initial fixtures with intercostal rib soreness. "
+            "Shamsi's immediate 4 for 19 proved decisive in the Proteas' one-run thriller in St Vincent."
+        )
+    },
+    {
+        "title": "Monank Patel Misses Critical Fixtures with Shoulder Sprain",
+        "category": "Team Updates & Injuries",
+        "source": "ICC Media Release",
+        "published_date": "2024-06-12",
+        "text": (
+            "USA captain and wicketkeeper Monank Patel was sidelined for pivotal Super Eight fixtures due to an acute left shoulder sprain sustained during fielding drills. "
+            "Aaron Jones stepped up as stand-in captain, leading the American side through historic matches against India and South Africa."
+        )
+    },
+    {
+        "title": "Matheesha Pathirana Managed Carefully Following Hamstring Tightness",
+        "category": "Team Updates & Injuries",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-10",
+        "text": (
+            "Sri Lanka's medical team instituted strict over limits for fast bowling sensation Matheesha Pathirana after he experienced hamstring tightness. "
+            "The 21-year-old was monitored closely by team physiotherapists to prevent aggravating soft tissue injuries."
+        )
+    },
+    {
+        "title": "Rishabh Pant's Remarkable Comeback Form Inspires Teammates",
+        "category": "Team Updates & Injuries",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-28",
+        "text": (
+            "Rishabh Pant's flawless wicketkeeping and aggressive batting throughout the T20 World Cup served as an emotional inspiration to the Indian dressing room. "
+            "Eighteen months after surviving life-threatening injuries, Pant completed 14 dismissals and scored 171 crucial runs across the tournament."
+        )
+    },
+    {
+        "title": "Trent Boult Confirms 2024 T20 World Cup Was His Final Appearance for New Zealand",
+        "category": "Team Updates & Injuries",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-18",
+        "text": (
+            "Legendary left-arm fast bowler Trent Boult confirmed that New Zealand's concluding group match against PNG marked his farewell World Cup appearance. "
+            "The 34-year-old finished his T20 World Cup career with 34 wickets across four tournaments, closing a golden chapter in Kiwi cricket history."
+        )
+    },
+
+    # Category 7: Semifinals & Finals (14 articles)
+    {
+        "title": "India Crush Defending Champions England by 68 Runs in Guyana Semifinal",
+        "category": "Semifinals & Finals",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-27",
+        "text": (
+            "India exorcised the ghosts of their 2022 semifinal defeat with a thorough 68-run demolition of defending champions England at Providence Stadium in Guyana. "
+            "Batting first on a rain-interrupted, spinning surface, Rohit Sharma top-scored with a commanding 57 off 39 balls, while Suryakumar Yadav added 47 to push India to 171 for 7. "
+            "England's chase crumbled immediately against India's spin duo. Axar Patel dismissed Jos Buttler, Jonny Bairstow, and Moeen Ali to finish with 3 for 23, "
+            "while Kuldeep Yadav dismantled the lower order with 3 for 19. England were skittled for 103 in 16.4 overs, propelling India into the Barbados final."
+        )
+    },
+    {
+        "title": "South Africa Annihilate Afghanistan by Nine Wickets to Reach Maiden Men's World Cup Final",
+        "category": "Semifinals & Finals",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-27",
+        "text": (
+            "South Africa banished three decades of World Cup semifinal heartbreak by crushing Afghanistan by nine wickets at the Brian Lara Cricket Academy in Trinidad. "
+            "Pace spearheads Marco Jansen (3/16) and Kagiso Rabada (2/14) exploited seam and steep bounce on a spicy pitch, reducing Afghanistan to 28 for 6 before bowling them "
+            "out for just 56 runs in 11.5 overs—the lowest total ever recorded in a men's T20 World Cup semifinal. South Africa chased down the target in 8.5 overs, "
+            "with Reeza Hendricks and Aiden Markram seeing them into their first-ever senior ICC World Cup final."
+        )
+    },
+    {
+        "title": "Barbados Final Ball-by-Ball Breakdown: How India Defended 30 Off 30 Deliveries",
+        "category": "Semifinals & Finals",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-30",
+        "text": (
+            "A tactical breakdown of the final five overs at Kensington Oval illustrates one of the greatest rearguard defenses in modern sport. "
+            "With South Africa cruising at 151 for 4 needing 30 off 30, Hardik Pandya dismissed Heinrich Klaasen with an off-cutter outside off. "
+            "Jasprit Bumrah bowled Marco Jansen in the 18th over, conceding only two runs. Arshdeep Singh conceded four in the 19th over. "
+            "Entrusted with the 20th over, Hardik Pandya had David Miller caught on the boundary by Suryakumar Yadav and defended 16 runs to seal India's seven-run win."
+        )
+    },
+    {
+        "title": "Rahul Dravid's Fairy Tale Farewell as India Head Coach Concludes with Trophy",
+        "category": "Semifinals & Finals",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-06-30",
+        "text": (
+            "India head coach Rahul Dravid concluded his three-year tenure on the ultimate high as his side lifted the T20 World Cup in Barbados. "
+            "Usually stoic, Dravid threw his hands in the air and roared in emotional celebration as captain Rohit Sharma and Virat Kohli handed him the silverware. "
+            "'I'm really going to miss this group of players,' Dravid stated during his post-match press conference."
+        )
+    },
+    {
+        "title": "Aiden Markram Praises Proteas Pride Despite Heartbreaking Final Defeat",
+        "category": "Semifinals & Finals",
+        "source": "Reuters Cricket",
+        "published_date": "2024-06-30",
+        "text": (
+            "South Africa captain Aiden Markram expressed immense pride in his squad despite their agonizing seven-run defeat in the final. "
+            "Markram emphasized that reaching their first World Cup final was a breakthrough milestone for South African sport. 'We gave it everything "
+            "we had, and one game doesn't define this group. We will be back stronger,' Markram stated."
+        )
+    },
+    {
+        "title": "Hardik Pandya Silences Critics with Emotional Final Over Heroics",
+        "category": "Semifinals & Finals",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-06-30",
+        "text": (
+            "Following months of intense media scrutiny and boos during the domestic IPL season, Hardik Pandya experienced absolute redemption in Barbados. "
+            "Pandya took 3 for 20 in three clutch overs, dismissing Klaasen, Miller, and Rabada. Tears flowed freely as Pandya dropped to his knees at the conclusion "
+            "of the match, enveloped in hugs by teammates."
+        )
+    },
+    {
+        "title": "The Tactical Shift That Unlocked India's Semifinal Triumph Over England",
+        "category": "Semifinals & Finals",
+        "source": "The Guardian Sport",
+        "published_date": "2024-06-28",
+        "text": (
+            "India's strategy against England in Guyana reflected lessons learned from their Adelaide blowout 18 months prior. Rather than playing conservatively, "
+            "India continued attacking through Rohit Sharma and Suryakumar Yadav despite losing Kohli and Pant early. In the field, Rohit immediately opened with spin "
+            "in the powerplay, neutralizing England's openers before they could exploit pace on the ball."
+        )
+    },
+    {
+        "title": "Afghanistan's Fairy-Tale Journey Ends in Trinidad Semifinal but Leaves Lasting Legacy",
+        "category": "Semifinals & Finals",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-06-27",
+        "text": (
+            "Afghanistan's fairy-tale World Cup run ended in heartbreak against South Africa, but their journey captivated global audiences. "
+            "Victories over New Zealand, Australia, and Bangladesh established Jonathan Trott's team as legitimate world-title contenders rather than plucky underdogs, "
+            "inspiring millions across their war-torn homeland."
+        )
+    },
+    {
+        "title": "Melbourne 2022 Flashback: How England Won Their Second Title Against Pakistan",
+        "category": "Semifinals & Finals",
+        "source": "ICC Media Release",
+        "published_date": "2022-11-13",
+        "text": (
+            "In the 2022 final at the Melbourne Cricket Ground, England defeated Pakistan by five wickets before 80,462 fans. "
+            "Player of the match Sam Curran took 3 for 12 to restrict Pakistan to 137 for 8. Ben Stokes then anchored England's chase with an unbeaten 52 off 49 balls, "
+            "making England the first men's team to hold both the 50-over and 20-over World Cups simultaneously."
+        )
+    },
+    {
+        "title": "Dubai 2021 Flashback: Australia Claim Maiden T20 World Cup Crown Over New Zealand",
+        "category": "Semifinals & Finals",
+        "source": "ICC Media Release",
+        "published_date": "2021-11-14",
+        "text": (
+            "Australia won their maiden ICC Men's T20 World Cup title in Dubai, overcoming Trans-Tasman rivals New Zealand by eight wickets. "
+            "Despite Kane Williamson's sublime 85 off 48 balls lifting New Zealand to 172 for 4, Mitchell Marsh blasted 77 not out from 50 deliveries and "
+            "David Warner struck 53 to chase down the target with seven deliveries to spare."
+        )
+    },
+    {
+        "title": "Kolkata 2016 Flashback: Carlos Brathwaite's Four Sixes Shock England at Eden Gardens",
+        "category": "Semifinals & Finals",
+        "source": "BBC Sport Cricket",
+        "published_date": "2016-04-03",
+        "text": (
+            "Carlos Brathwaite entered cricket folklore by hitting four consecutive sixes off Ben Stokes in the final over at Eden Gardens, Kolkata. "
+            "With West Indies needing 19 runs off six balls to win their second T20 World Cup, Brathwaite launched an astonishing onslaught to seal an improbable "
+            "four-wicket victory, prompting Ian Bishop's immortal commentary: 'Carlos Brathwaite, remember the name!'"
+        )
+    },
+    {
+        "title": "Johannesburg 2007 Flashback: Misbah Scoop Hands Inaugural World Cup to India",
+        "category": "Semifinals & Finals",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2007-09-24",
+        "text": (
+            "The inaugural ICC World Twenty20 concluded with an unforgettable finale at the Wanderers in Johannesburg. "
+            "Defending 157, MS Dhoni entrusted the final over to unheralded medium-pacer Joginder Sharma. With six needed off four balls, Misbah-ul-Haq attempted "
+            "a scoop over fine leg, only for Sreesanth to take the catch, making India champions and changing the trajectory of global cricket forever."
+        )
+    },
+    {
+        "title": "Colombo 2012 Flashback: Marlon Samuels Smashes West Indies to Title Against Sri Lanka",
+        "category": "Semifinals & Finals",
+        "source": "Cricbuzz Desk",
+        "published_date": "2012-10-07",
+        "text": (
+            "Marlon Samuels played a solo masterclass of 78 off 56 balls to rescue West Indies from 32 for 2 at R Premadasa Stadium in Colombo. "
+            "Despite Ajantha Mendis' 4 for 12, West Indies defended 137, bowling Sri Lanka out for 101 to claim their first ICC trophy in eight years."
+        )
+    },
+    {
+        "title": "Dhaka 2014 Flashback: Sri Lanka End Finals Curse Against India at Mirpur",
+        "category": "Semifinals & Finals",
+        "source": "The Guardian Sport",
+        "published_date": "2014-04-06",
+        "text": (
+            "Sri Lanka broke their streak of four consecutive ICC tournament final losses by defeating India by six wickets at the Sher-e-Bangla Stadium in Dhaka. "
+            "Lasith Malinga and Nuwan Kulasekara bowled pin-point wide yorkers at the death, restricting Virat Kohli (77) and India to 130 for 4. "
+            "Kumar Sangakkara guided the chase with an unbeaten 52 in his final T20 international appearance."
+        )
+    },
+
+    # Category 8: Historical Tournament Milestones (12 articles)
+    {
+        "title": "The Birth of a Phenomenon: How the 2007 Inaugural World Cup Changed Cricket",
+        "category": "Historical Tournament Milestones",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-18",
+        "text": (
+            "Retrospective analysis of the 2007 World Twenty20 in South Africa underscores how the tournament revolutionized the global sporting economy. "
+            "Initially regarded skeptically by traditional cricket boards, the fast-paced 20-over format generated immense television ratings and fan engagement. "
+            "The triumph of MS Dhoni's youthful Indian team directly accelerated the founding of the Indian Premier League (IPL) in 2008."
+        )
+    },
+    {
+        "title": "Yuvraj Singh's Six Sixes in an Over Against Stuart Broad in Durban",
+        "category": "Historical Tournament Milestones",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-05-19",
+        "text": (
+            "On September 19, 2007, at Kingsmead, Durban, India's Yuvraj Singh accomplished the rarest feat in cricket by hitting six sixes in a single over "
+            "off England's Stuart Broad. Spurred by an altercation with Andrew Flintoff, Yuvraj deposited deliveries across all sectors of the ground, "
+            "reaching a half-century off just 12 balls—a record that stood untouched for nearly two decades."
+        )
+    },
+    {
+        "title": "Chris Gayle Smashes First-Ever T20 International Century in Tournament Opener",
+        "category": "Historical Tournament Milestones",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-17",
+        "text": (
+            "The opening match of the 2007 ICC World Twenty20 at the Wanderers saw West Indies powerhouse Chris Gayle hit the first official century in T20 international history. "
+            "Gayle hammered 117 from 57 deliveries against South Africa, featuring seven fours and 10 towering sixes, establishing the template for opening batters worldwide."
+        )
+    },
+    {
+        "title": "England's 2010 Caribbean Triumph: Paul Collingwood Leads First Global Trophy Win",
+        "category": "Historical Tournament Milestones",
+        "source": "The Guardian Sport",
+        "published_date": "2024-05-21",
+        "text": (
+            "In 2010 at Kensington Oval in Barbados, England secured their first-ever ICC global trophy by defeating Australia by seven wickets. "
+            "Under the leadership of Paul Collingwood, Craig Kieswetter (63) and Kevin Pietersen (47) dismantled Australia's 147-run target, "
+            "with Pietersen named Player of the Tournament for his revolutionary switch-hits and dominant batting."
+        )
+    },
+    {
+        "title": "The Evolution of T20 World Cup Trophy: From South Africa 2007 to USA 2024",
+        "category": "Historical Tournament Milestones",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-22",
+        "text": (
+            "Across nine editions spanning 17 years, the ICC Men's T20 World Cup has crowned six distinct champions: India (2007, 2024), Pakistan (2009), "
+            "England (2010, 2022), West Indies (2012, 2016), Sri Lanka (2014), and Australia (2021). The expansion from 12 teams in 2007 to 20 teams in 2024 "
+            "marks cricket's emergence as an authentic global spectacle."
+        )
+    },
+    {
+        "title": "Shahid Afridi Guides Pakistan to 2009 Glory at Lord's",
+        "category": "Historical Tournament Milestones",
+        "source": "Reuters Cricket",
+        "published_date": "2024-05-23",
+        "text": (
+            "Pakistan redeemed their 2007 final defeat by winning the 2009 ICC World Twenty20 at Lord's in London. "
+            "All-rounder Shahid Afridi delivered consecutive player-of-the-match performances in the semifinal against South Africa and the final against Sri Lanka, "
+            "scoring an unbeaten 54 and taking crucial wickets to bring joy to Pakistan during difficult national times."
+        )
+    },
+    {
+        "title": "Ajantha Mendis and the Rise of the 'Carrom Ball' in World Cricket",
+        "category": "Historical Tournament Milestones",
+        "source": "Cricbuzz Desk",
+        "published_date": "2024-05-24",
+        "text": (
+            "Sri Lankan mystery spinner Ajantha Mendis stunned international batters during the 2012 T20 World Cup in Sri Lanka, taking 6 for 8 against Zimbabwe—the best "
+            "bowling figures in tournament history. Mendis introduced the 'carrom ball', flicked out with the middle finger, inspiring subsequent generations of spinners."
+        )
+    },
+    {
+        "title": "Brendon McCullum's 123 in Pallekele Remains Highest Individual T20 World Cup Score",
+        "category": "Historical Tournament Milestones",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-25",
+        "text": (
+            "New Zealand captain Brendon McCullum etched his name into history during the 2012 tournament by scoring 123 off 58 balls against Bangladesh in Pallekele. "
+            "McCullum's innings included 11 fours and seven sixes, remaining the highest individual score in the history of the Men's T20 World Cup."
+        )
+    },
+    {
+        "title": "The Historic India vs Pakistan Durban Bowl-Out of 2007",
+        "category": "Historical Tournament Milestones",
+        "source": "BBC Sport Cricket",
+        "published_date": "2024-05-26",
+        "text": (
+            "Before the introduction of the Super Over, tied T20 matches were decided by a football-style bowl-out. "
+            "In Durban during the 2007 group stage, India and Pakistan tied on 141. India used Virender Sehwag, Harbhajan Singh, and Robin Uthappa, "
+            "all three hitting the unguarded stumps, while Pakistan's frontline pacers all missed, creating one of cricket's most iconic quirky memories."
+        )
+    },
+    {
+        "title": "Darren Sammy: The Only Captain to Lift the T20 World Cup Twice",
+        "category": "Historical Tournament Milestones",
+        "source": "The Guardian Sport",
+        "published_date": "2024-05-27",
+        "text": (
+            "Darren Sammy holds the unique distinction of captaining West Indies to two ICC Men's T20 World Cup championships in 2012 and 2016. "
+            "Known for his inspirational leadership and ability to unite Caribbean players under difficult administrative circumstances, "
+            "Sammy's achievements earned him the renaming of St Lucia's premier national stadium in his honor."
+        )
+    },
+    {
+        "title": "Associate Nations That Made History: From Netherlands 2009 to USA 2024",
+        "category": "Historical Tournament Milestones",
+        "source": "ICC Media Release",
+        "published_date": "2024-05-28",
+        "text": (
+            "The T20 World Cup has continually provided a stage for Associate nations to topple cricketing superpowers. From the Netherlands shocking England "
+            "at Lord's in the 2009 tournament opener, to Zimbabwe edging Pakistan by one run at Perth in 2022, and the USA defeating Pakistan in Dallas in 2024, "
+            "these upsets underscore the democratization and global reach of 20-over cricket."
+        )
+    },
+    {
+        "title": "Virat Kohli's Timeless MCG Masterpiece Against Pakistan in 2022",
+        "category": "Historical Tournament Milestones",
+        "source": "ESPNcricinfo Staff",
+        "published_date": "2024-05-29",
+        "text": (
+            "On October 23, 2022, before 90,293 spectators at the Melbourne Cricket Ground, Virat Kohli played what many consider the greatest T20 innings ever played. "
+            "With India reeling at 31 for 4 chasing 160 against Pakistan, Kohli orchestrated a miraculous chase, culminating in an unbeaten 82 off 53 balls. "
+            "His back-foot straight six off Haris Rauf in the penultimate over was officially voted the ICC Shot of the Decade."
+        )
+    },
+]
+
+
+def generate_csv():
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(DATA_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["article_id", "title", "article_text", "category", "source", "published_date"])
+        for idx, art in enumerate(ARTICLES, start=1):
+            article_id = f"T20-{idx:03d}"
+            writer.writerow([
+                article_id,
+                art["title"].strip(),
+                art["text"].strip(),
+                art["category"].strip(),
+                art["source"].strip(),
+                art["published_date"].strip()
+            ])
+    print(f"Successfully generated {len(ARTICLES)} articles at {DATA_FILE}")
+
+
+if __name__ == "__main__":
+    generate_csv()
