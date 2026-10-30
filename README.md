@@ -249,22 +249,3 @@ python -m unittest discover -s tests -p "test_*.py"
 
 ---
 
-## 11. Application Screenshots
-
-*(Place application screenshots in this section for your project report)*
-
-- **Home Dashboard:**
-  `![Home Dashboard](outputs/screenshots/home_dashboard.png)`
-- **Text Summarizer View:**
-  `![Text Summarizer](outputs/screenshots/summarizer_view.png)`
-- **2D Clustering Visualization:**
-  `![Clustering SVD](outputs/screenshots/clustering_svd.png)`
-- **Custom Article Analyzer:**
-  `![Custom Analyzer](outputs/screenshots/custom_analyzer.png)`
-
----
-
-## 12. Author & Academic Attribution
-- **Project Title:** T20 Cricket World Cup News Analysis Using Text Summarization and Clustering
-- **Domain:** Natural Language Processing (NLP) & Unsupervised Machine Learning
-- **Institution:** Department of Computer Science & Engineering
