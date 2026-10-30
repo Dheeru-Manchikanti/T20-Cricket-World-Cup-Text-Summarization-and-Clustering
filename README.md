@@ -1,6 +1,6 @@
 # T20 Cricket World Cup News Analysis Using Text Summarization and Clustering
 
-An end-to-end Natural Language Processing (NLP) and Machine Learning application designed for college-level coursework, practicals, and academic presentations. The platform extracts concise summaries from long cricket articles and discovers latent topics across tournament reporting using unsupervised machine learning.
+An end-to-end Natural Language Processing (NLP) and Machine Learning application designed for simple explation of articles.The platform extracts concise summaries from long cricket articles and discovers latent topics across tournament reporting using unsupervised machine learning.
 
 ---
 
@@ -161,7 +161,7 @@ Follow these exact steps in your VS Code terminal on Windows:
 
 ### Step 1: Open Terminal in the Project Directory
 ```powershell
-cd c:\Users\anjan\OneDrive\Desktop\lab\t20_world_cup_text_analyzer
+cd *\t20_world_cup_text_analyzer
 ```
 
 ### Step 2: Create a Virtual Environment (Recommended)
